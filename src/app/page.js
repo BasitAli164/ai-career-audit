@@ -6,7 +6,6 @@ import { AnalysisForm } from "@/components/analysis/AnalysisForm";
 import { ResultsDashboard } from "@/components/results/ResultsDashboard";
 import { Header } from "@/components/shared/Header";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
-import { extractPDFText } from "@/lib/pdf/parser";
 import { fetchGitHubRepos } from "@/lib/github/client";
 import { Toaster, toast } from "sonner";
 
@@ -21,14 +20,26 @@ export default function HomePage() {
       const username = extractUsername(githubUrl);
       if (!username) throw new Error("Invalid GitHub URL");
 
-      // Parse PDF
-      const fileBuffer = await file.arrayBuffer();
-      const resumeText = await extractPDFText(fileBuffer);
+      // 1. Parse PDF via API (server-side)
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const pdfRes = await fetch('/api/parse-pdf', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!pdfRes.ok) {
+        const errorData = await pdfRes.json();
+        throw new Error(errorData.error || 'Failed to parse PDF');
+      }
+      
+      const { text: resumeText } = await pdfRes.json();
 
-      // Fetch GitHub repos
+      // 2. Fetch GitHub repos
       const githubData = await fetchGitHubRepos(username);
 
-      // Call API
+      // 3. Call analysis API
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

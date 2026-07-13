@@ -6,8 +6,10 @@ export const analyzeRequestSchema = z.object({
     z.object({
       name: z.string(),
       stars: z.number().int().nonnegative(),
-      description: z.string().optional(),
-      language: z.string().optional(),
+      description: z.string().nullable().optional().default(""),
+      language: z.string().nullable().optional().default("Unknown"),
+      forks: z.number().int().nonnegative().optional(),
+      url: z.string().optional(),
     })
   ),
 });

@@ -1,8 +1,20 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Use the latest Gemini 2.0 Flash for speed & quality
 export const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-export const MODEL = "gemini-2.0-flash-exp";
+// HIGHEST QUOTA MODELS (Recommended for hackathon)
+export const MODELS = {
+  // Best for high-volume requests - Highest quota available
+  FLASH_LITE: "gemini-3.1-flash-lite",  // Ultra-efficient, highest quota
+  FLASH: "gemini-2.5-flash",             // Balanced speed & quota
+  
+  // Lower quota but better quality
+  FLASH_35: "gemini-3.5-flash",           // Flagship model, good quota
+  PRO: "gemini-2.5-pro",                 // Lower quota, better reasoning
+  PRO_PREVIEW: "gemini-3.1-pro-preview", // Lowest quota, experimental
+};
+
+// Default to highest quota model
+export const MODEL = MODELS.FLASH_LITE;  // or MODELS.FLASH
